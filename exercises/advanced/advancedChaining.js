@@ -15,15 +15,57 @@
  */
 
 var Promise = require('bluebird');
-var lib = require('../../lib/advancedChainingLib.js');
+//var lib = require('../../lib/advancedChainingLib.js');
+var lib = Promise.promisifyAll(require('../../lib/advancedChainingLib.js'));
+var _ = require('underscore');
+
 
 // We're using Clarifai's API to recognize different an image into a list of tags
 // Visit the following url to sign up for a free account
 //     https://developer.clarifai.com/accounts/login/?next=/applications/
 // Then, create a new Application and pass your Client Id and Client Secret into the method below
-lib.setImageTaggerCredentials('YOUR_CLIENT_ID', 'YOUR_CLIENT_SECRET');
+lib.setImageTaggerCredentials('P9QlUCV00tIjY1a_C97w3JBMbfS7EPHlcqpurG1A', '31anD55gW8TVIbKfTDPBM8zYq0iwgKHm-Qe8kR5Y');
 
 var searchCommonTagsFromGitHubProfiles = function(githubHandles) {
+  var files = [];
+  // _.each(githubHandles, function(file) {
+  //   files.push(lib.getGitHubProfile(file));
+  // });
+
+  // return Promise.all(files)
+  //   .then(function(profile) {
+  //     console.log('prof', profile);
+  //     return [profile[0].avatarUrl, lib.authenticateImageTagger()];
+  //   })
+  //   .spread(function(url, token){
+  //     return lib.tagImage(url, token);
+  //   }).then(function(data){
+  //     console.log('data', data);
+  //     return lib.getIntersection([data]);
+  //   })
+
+  _.each(githubHandles, function(file) {
+    files.push(lib.getGitHubProfile(file)
+      .then(function(profile) {
+        console.log('prof', profile);
+        return [profile.avatarUrl, lib.authenticateImageTagger()];
+      })
+      .spread(function(url, token){
+        return lib.tagImage(url, token);
+      })
+      // .then(function(data){
+      //    console.log('firstdata', data);
+      //    return lib.getIntersection([data]);
+      // })
+    );
+  });
+
+  return Promise.all(files)
+    .then(function(data){
+      console.log('data', data);
+      return lib.getIntersection(data);
+    });
+    
 };
 
 // Export these functions so we can unit test them
