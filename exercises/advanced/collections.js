@@ -9,11 +9,44 @@
  */
 
 
+
+var Promise = require('bluebird');
+
+// Promise.config({
+//     // Enable warnings
+//     warnings: true,
+//     // Enable long stack traces
+//     longStackTraces: true,
+//     // Enable cancellation
+//     cancellation: true,
+//     // Enable monitoring
+//     monitoring: true
+// });
+
+var _ = require('underscore');
+var fs = Promise.promisifyAll(require('fs'));
+var combiner = require('../bare_minimum/promiseConstructor');
+
 var combineFirstLineOfManyFiles = function(filePaths, writePath) {
  // TODO
+  var files = [];
+  _.each(filePaths, function(file) {
+    files.push(combiner.pluckFirstLineFromFileAsync(file));
+  });
+
+  return Promise.all(files)
+    .then(function(lines) {
+      return fs.writeFileAsync(writePath, lines.join('\n'));
+    });
+
 };
 
 // Export these functions so we can unit test them
 module.exports = {
   combineFirstLineOfManyFiles: combineFirstLineOfManyFiles
 };
+
+
+
+
+

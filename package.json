@@ -20,6 +20,7 @@
     "eslint-config-hackreactor": "git://github.com/hackreactor-labs/eslint-config-hackreactor",
     "mocha": "^2.2.5",
     "nock": "^2.15.0",
-    "request": "^2.61.0"
+    "request": "^2.61.0",
+    "underscore": "^1.8.3"
   }
 }
